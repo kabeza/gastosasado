@@ -22,12 +22,13 @@ function escribirJSON(clave, valor) {
 }
 
 function normalizarActual(a) {
-  if (!a || typeof a !== 'object') return { asistentes: [], gastos: [], titulo: '', fecha: '' }
-  const out = { asistentes: [], gastos: [], titulo: '', fecha: '' }
+  if (!a || typeof a !== 'object') return { asistentes: [], gastos: [], titulo: '', fecha: '', guardado: false }
+  const out = { asistentes: [], gastos: [], titulo: '', fecha: '', guardado: false }
   if (Array.isArray(a.asistentes)) out.asistentes = a.asistentes
   if (Array.isArray(a.gastos)) out.gastos = a.gastos
   if (typeof a.titulo === 'string') out.titulo = a.titulo
   if (typeof a.fecha === 'string') out.fecha = a.fecha
+  if (typeof a.guardado === 'boolean') out.guardado = a.guardado
   return out
 }
 

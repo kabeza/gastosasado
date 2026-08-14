@@ -1,24 +1,26 @@
 <script>
   import { formatearARS } from '../lib/format.js'
-  import { categoriaPorId } from '../lib/constants.js'
 
-  let { gasto } = $props()
+  let { gasto, onEditar, onBorrar } = $props()
 
-  const cat = $derived(categoriaPorId(gasto.categoria))
-  const icon = $derived(cat?.icon ?? 'receipt_long')
-  const titulo = $derived(gasto.concepto || cat?.label || 'Gasto')
+  const titulo = $derived(gasto.concepto || 'Gasto')
 </script>
 
 <li class="card">
-  <span class="icon material-symbols-outlined">{icon}</span>
+  <span class="icon material-symbols-outlined">receipt_long</span>
   <div class="body">
     <span class="titulo">{titulo}</span>
     <span class="pagador">pagó {gasto.pagador}</span>
-    {#if cat}
-      <span class="tag">{cat.label}</span>
-    {/if}
   </div>
   <span class="monto">{formatearARS(gasto.monto)}</span>
+  <div class="acciones">
+    <button class="act" onclick={() => onEditar?.(gasto)} aria-label="Editar gasto">
+      <span class="material-symbols-outlined">edit</span>
+    </button>
+    <button class="act" onclick={() => onBorrar?.(gasto.id)} aria-label="Borrar gasto">
+      <span class="material-symbols-outlined">delete</span>
+    </button>
+  </div>
 </li>
 
 <style>
@@ -59,20 +61,27 @@
     color: rgba(48, 31, 24, 0.55);
   }
 
-  .tag {
-    align-self: flex-start;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 999px;
-    background: rgba(228, 177, 72, 0.2);
-    color: var(--primary);
-    margin-top: 4px;
-  }
-
   .monto {
     font-weight: 800;
     font-size: 15px;
     flex-shrink: 0;
+  }
+
+  .acciones {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .act {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    color: rgba(48, 31, 24, 0.45);
+  }
+
+  .act .material-symbols-outlined {
+    font-size: 18px;
   }
 </style>

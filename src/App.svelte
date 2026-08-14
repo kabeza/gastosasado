@@ -5,9 +5,10 @@
   import CargarGasto from './views/CargarGasto.svelte'
   import Cuentas from './views/Cuentas.svelte'
   import Historial from './views/Historial.svelte'
-  import { reiniciarActual } from './lib/store.svelte.js'
+  import { reiniciarActual, borrarGasto as borrarGastoStore } from './lib/store.svelte.js'
 
   let current = $state('resumen')
+  let gastoEditando = $state(null)
   let mainEl = $state(null)
 
   $effect(() => {
@@ -16,7 +17,23 @@
   })
 
   function go(view) {
+    if (view === 'cargar') gastoEditando = null
     current = view
+  }
+
+  function editarGasto(g) {
+    gastoEditando = g
+    current = 'cargar'
+  }
+
+  function borrarGasto(id) {
+    if (!window.confirm('¿Borrar este gasto?')) return
+    borrarGastoStore(id)
+  }
+
+  function onGastoGuardado() {
+    gastoEditando = null
+    current = 'resumen'
   }
 
   function reiniciar() {
@@ -26,17 +43,17 @@
   }
 </script>
 
-<Header {current} onHistory={() => go('historial')} />
+<Header {current} onHistory={() => go(current === 'historial' ? 'resumen' : 'historial')} onHome={() => go('resumen')} />
 
 <main bind:this={mainEl}>
   {#if current === 'resumen'}
-    <Resumen onCargar={() => go('cargar')} />
+    <Resumen onCargar={() => go('cargar')} onEditar={editarGasto} onBorrar={borrarGasto} />
   {:else if current === 'cargar'}
-    <CargarGasto onAgregado={() => go('resumen')} />
+    <CargarGasto gastoInicial={gastoEditando} onAgregado={onGastoGuardado} onIrAsistentes={() => go('resumen')} />
   {:else if current === 'cuentas'}
-    <Cuentas onReiniciar={reiniciar} />
+    <Cuentas />
   {:else if current === 'historial'}
-    <Historial />
+    <Historial onAbrir={() => go('cuentas')} />
   {/if}
 </main>
 

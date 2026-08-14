@@ -36,7 +36,6 @@ gastosasado/
     ├── main.js
     ├── App.svelte            # shell: Header + vista activa + BottomNav
     ├── lib/
-    │   ├── constants.js      # categorías, colores, labels
     │   ├── storage.js        # lectura/escritura localStorage + prune a 10
     │   ├── store.js          # estado reactivo (evento actual + historial)
     │   ├── liquidacion.js    # reparto, neto, transferencias mínimas, redondeo
@@ -44,7 +43,8 @@ gastosasado/
     ├── components/
     │   ├── Header.svelte
     │   ├── BottomNav.svelte
-    │   └── GastoCard.svelte
+    │   ├── GastoCard.svelte
+    │   └── Asistentes.svelte
     └── views/
         ├── Resumen.svelte      # estado vacío + lista de gastos
         ├── CargarGasto.svelte  # formulario de gasto
@@ -58,7 +58,7 @@ Dos claves:
 
 - **`gastosasado.actual`** — el asado en edición (borrador):
   ```js
-  { asistentes: [string], gastos: [Gasto] }
+  { asistentes: [string], gastos: [Gasto], titulo: string, fecha: string, guardado: boolean }
   ```
 - **`gastosasado.historial`** — hasta 10 eventos guardados (más recientes primero):
   ```js
@@ -71,7 +71,6 @@ Dos claves:
   id: string,             // uuid
   pagador: string,        // nombre del asistente
   concepto: string,       // texto libre "qué compró"
-  categoria: string|null, // 'carne'|'leña'|'ensalada'|'fernet'|'hielo'|'picada'|'pan'|'otros'|null
   monto: number,          // en CENTAVOS (entero) — ver §5
   excluidos: string[],    // asistentes que NO participan de este gasto
 }
@@ -106,7 +105,7 @@ Dos claves:
 
 ## 6. Flujo de guardado e historial
 
-- **Guardar:** al generar la liquidación (vista Cuentas), se pide título (obligatorio) y se guarda el evento con `fecha = hoy`. Si existe un evento con la misma `titulo + fecha`, se sobrescribe.
+- **Guardar:** botón "Guardar" junto al campo título en Cuentas (título obligatorio) y se guarda el evento con `fecha = hoy`. Si existe un evento con la misma `titulo + fecha`, se sobrescribe. Una vez guardado, los cambios posteriores de gastos/asistentes actualizan el evento automáticamente (vía `sincronizarGuardado` en el store).
 - **Fecha al reabrir:** al abrir un evento guardado, se carga a `actual` **conservando su `titulo` y `fecha` originales**. Al regenerar, se sobrescribe con esa misma clave (no se re-stampa "hoy"). Esto resuelve el caso borde §9 de la visión.
 - **Reiniciar:** limpia `gastosasado.actual` y vuelve al estado vacío. No toca `historial`.
 - **Historial:** máximo 10; al guardar el 11.º se descarta el más viejo. Borrado individual por evento.

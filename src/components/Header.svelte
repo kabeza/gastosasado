@@ -1,5 +1,5 @@
 <script>
-  let { current, onHistory } = $props()
+  let { current, onHistory, onHome } = $props()
 
   const titles = {
     resumen: 'Resumen',
@@ -10,10 +10,9 @@
 </script>
 
 <header>
-  <div class="logo">
+  <button class="logo" onclick={onHome} aria-label="Ir al resumen">
     <img src="gastoslogo.png" alt="Gastos Asado" />
-    <span class="brand">GASTOS ASADO</span>
-  </div>
+  </button>
   <span class="title">{titles[current] ?? ''}</span>
   <button class="history" onclick={onHistory} aria-label="Historial">
     <span class="material-symbols-outlined">history</span>
@@ -33,21 +32,14 @@
   .logo {
     display: flex;
     align-items: center;
-    gap: 8px;
     flex-shrink: 0;
+    padding: 0;
   }
 
   .logo img {
-    height: 44px;
+    height: 59px;
     width: auto;
     flex-shrink: 0;
-  }
-
-  .brand {
-    font-weight: 800;
-    font-size: 13px;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
   }
 
   .title {

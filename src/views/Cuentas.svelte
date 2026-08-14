@@ -1,46 +1,66 @@
 <script>
-  import { onMount } from 'svelte'
   import { actual, guardarEvento } from '../lib/store.svelte.js'
   import { liquidar } from '../lib/liquidacion.js'
   import { formatearARS, formatearFecha, fechaHoyISO } from '../lib/format.js'
-
-  let { onReiniciar } = $props()
+  import { generarImagenResumen, compartirImagen } from '../lib/imagen.js'
+  import { construirMensaje } from '../lib/mensaje.js'
 
   const res = $derived(liquidar({ asistentes: actual.asistentes, gastos: actual.gastos }))
   const nPersonas = $derived(actual.asistentes.length)
   const promedio = $derived(nPersonas > 0 ? Math.round(res.total / nPersonas) : 0)
   const saldadas = $derived(res.balances.filter((b) => b.balance === 0).map((b) => b.nombre))
 
-  // Auto-guardar: al entrar (si ya hay título) y al dejar el campo de título.
-  function guardarSiCorresponde() {
-    const titulo = String(actual.titulo ?? '').trim()
-    if (titulo && actual.gastos.length > 0) guardarEvento()
+  let tituloTxt = $state(actual.titulo ?? '')
+  let feedback = $state('')
+  let compartirComoImagen = $state(false)
+
+  function guardar() {
+    const t = tituloTxt.trim()
+    if (!t) {
+      feedback = 'Escribí un título para el asado'
+      return
+    }
+    actual.titulo = t
+    guardarEvento()
+    feedback = 'Guardado ✓ (los cambios siguientes se actualizan solos)'
   }
 
-  onMount(() => {
-    guardarSiCorresponde()
-  })
-
-  function construirMensaje() {
-    const fecha = formatearFecha(actual.fecha || fechaHoyISO())
-    const lineas = [`🍖 ${actual.titulo} — ${fecha}`, '', `Total: ${formatearARS(res.total)}`]
-    if (nPersonas > 0) {
-      lineas.push(`Por persona: ${formatearARS(promedio)} (${nPersonas})`)
+  async function compartir() {
+    if (!actual.guardado || !actual.titulo) {
+      feedback = 'Guardá el título del asado antes de compartir'
+      return
     }
-    lineas.push('')
-    if (res.transferencias.length > 0) {
-      lineas.push('💸 Transferencias:')
-      for (const t of res.transferencias) {
-        lineas.push(`· ${t.de} le debe a ${t.a}: ${formatearARS(t.monto)}`)
+    if (tituloTxt.trim() !== actual.titulo) {
+      feedback = 'Guardá los cambios del título antes de compartir'
+      return
+    }
+
+    if (compartirComoImagen) {
+      try {
+        const file = await generarImagenResumen({
+          titulo: actual.titulo,
+          fecha: formatearFecha(actual.fecha || fechaHoyISO()),
+          gastos: actual.gastos,
+          total: res.total,
+          promedio,
+          transferencias: res.transferencias
+        })
+        await compartirImagen(file)
+      } catch (err) {
+        console.error(err)
+        feedback = 'No se pudo generar la imagen. Reintentá.'
       }
-    } else {
-      lineas.push('✅ Cuentas saldadas')
+      return
     }
-    return lineas.join('\n')
-  }
 
-  function compartir() {
-    window.open('https://wa.me/?text=' + encodeURIComponent(construirMensaje()), '_blank')
+    const mensaje = construirMensaje({
+      titulo: actual.titulo,
+      fecha: actual.fecha,
+      gastos: actual.gastos,
+      asistentes: actual.asistentes,
+      transferencias: res.transferencias
+    })
+    window.open('https://wa.me/?text=' + encodeURIComponent(mensaje), '_blank')
   }
 </script>
 
@@ -53,13 +73,21 @@
   <div class="cuentas">
     <section class="titulo">
       <label for="titulo">Título del asado</label>
-      <input
-        id="titulo"
-        type="text"
-        placeholder="ej. Asado del sábado"
-        bind:value={actual.titulo}
-        onblur={guardarSiCorresponde}
-      />
+      <div class="titulo-row">
+        <input
+          id="titulo"
+          type="text"
+          placeholder="ej. Asado del sábado"
+          bind:value={tituloTxt}
+        />
+        <button class="guardar" onclick={guardar}>
+          <span class="material-symbols-outlined">check</span>
+          Guardar
+        </button>
+      </div>
+      {#if feedback}
+        <p class="feedback">{feedback}</p>
+      {/if}
     </section>
 
     <div class="resumen">
@@ -91,13 +119,15 @@
       </div>
     {/if}
 
-    <div class="acciones">
-      <button class="whatsapp" onclick={compartir}>
-        <span class="material-symbols-outlined">share</span>
-        Compartir por WhatsApp
-      </button>
-      <button class="reiniciar" onclick={onReiniciar}>Reiniciar Evento</button>
-    </div>
+    <label class="img-check">
+      <input type="checkbox" bind:checked={compartirComoImagen} />
+      Compartir como imagen
+    </label>
+
+    <button class="whatsapp" onclick={compartir}>
+      <span class="material-symbols-outlined">{compartirComoImagen ? 'image' : 'share'}</span>
+      {compartirComoImagen ? 'Compartir imagen' : 'Compartir por WhatsApp'}
+    </button>
   </div>
 {/if}
 
@@ -132,7 +162,15 @@
     font-size: 14px;
   }
 
-  .titulo input {
+  .titulo-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .titulo-row input {
+    flex: 1;
+    min-width: 0;
     font: inherit;
     font-size: 16px;
     padding: 12px;
@@ -140,6 +178,30 @@
     border-radius: var(--radius-sm);
     background: #fff;
     color: var(--primary);
+  }
+
+  .guardar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .guardar .material-symbols-outlined {
+    font-size: 18px;
+  }
+
+  .feedback {
+    margin: 0;
+    font-size: 13px;
+    color: var(--success);
+    font-weight: 600;
   }
 
   .resumen {
@@ -226,11 +288,19 @@
     text-decoration: line-through;
   }
 
-  .acciones {
+  .img-check {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    gap: 8px;
     margin-top: 20px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .img-check input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--success);
   }
 
   .whatsapp {
@@ -238,21 +308,12 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
+    margin-top: 12px;
     padding: 14px;
     border-radius: var(--radius-lg);
     background: var(--success);
     color: #fff;
     font-weight: 800;
     font-size: 15px;
-  }
-
-  .reiniciar {
-    padding: 14px;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--danger);
-    color: var(--danger);
-    font-weight: 700;
-    font-size: 15px;
-    background: none;
   }
 </style>

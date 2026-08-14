@@ -20,12 +20,19 @@ function nuevoId() {
   return `gasto-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+// Si el evento ya fue guardado, cualquier cambio posterior actualiza el evento
+// guardado en el historial (aunque no se comparta por WhatsApp).
+function sincronizarGuardado() {
+  if (actual.guardado) guardarEvento()
+}
+
 export function agregarAsistente(nombre) {
   const limpio = String(nombre ?? '').trim()
   if (!limpio) return false
   if (actual.asistentes.includes(limpio)) return false
   actual.asistentes.push(limpio)
   guardarActual()
+  sincronizarGuardado()
   return true
 }
 
@@ -39,7 +46,6 @@ export function agregarGasto(gasto) {
     id: gasto.id ?? nuevoId(),
     pagador,
     concepto: String(gasto?.concepto ?? '').trim(),
-    categoria: gasto?.categoria ?? null,
     monto,
     excluidos: Array.isArray(gasto?.excluidos) ? gasto.excluidos.slice() : []
   }
@@ -49,6 +55,76 @@ export function agregarGasto(gasto) {
     actual.asistentes.push(pagador)
   }
   guardarActual()
+  sincronizarGuardado()
+  return true
+}
+
+export function editarGasto(id, datos) {
+  const idx = actual.gastos.findIndex((g) => g.id === id)
+  if (idx < 0) return false
+
+  const pagador = String(datos?.pagador ?? '').trim()
+  const monto = Math.round(Number(datos?.monto) || 0)
+  if (!pagador || monto <= 0) return false
+
+  const gasto = actual.gastos[idx]
+  gasto.pagador = pagador
+  gasto.concepto = String(datos?.concepto ?? '').trim()
+  gasto.monto = monto
+  gasto.excluidos = Array.isArray(datos?.excluidos) ? datos.excluidos.slice() : []
+
+  if (!actual.asistentes.includes(pagador)) {
+    actual.asistentes.push(pagador)
+  }
+  guardarActual()
+  sincronizarGuardado()
+  return true
+}
+
+export function borrarGasto(id) {
+  const antes = actual.gastos.length
+  actual.gastos = actual.gastos.filter((g) => g.id !== id)
+  if (actual.gastos.length === antes) return false
+  guardarActual()
+  sincronizarGuardado()
+  return true
+}
+
+export function renombrarAsistente(viejo, nuevo) {
+  const v = String(viejo ?? '').trim()
+  const n = String(nuevo ?? '').trim()
+  if (!v || !n || v === n) return false
+  if (actual.asistentes.includes(n)) return false
+
+  const i = actual.asistentes.indexOf(v)
+  if (i < 0) return false
+  actual.asistentes[i] = n
+
+  for (const g of actual.gastos) {
+    if (g.pagador === v) g.pagador = n
+    if (Array.isArray(g.excluidos)) {
+      const j = g.excluidos.indexOf(v)
+      if (j >= 0) g.excluidos[j] = n
+    }
+  }
+  guardarActual()
+  sincronizarGuardado()
+  return true
+}
+
+export function borrarAsistente(nombre) {
+  const n = String(nombre ?? '').trim()
+  if (!n || !actual.asistentes.includes(n)) return false
+
+  actual.asistentes = actual.asistentes.filter((a) => a !== n)
+  actual.gastos = actual.gastos.filter((g) => g.pagador !== n)
+  for (const g of actual.gastos) {
+    if (Array.isArray(g.excluidos)) {
+      g.excluidos = g.excluidos.filter((e) => e !== n)
+    }
+  }
+  guardarActual()
+  sincronizarGuardado()
   return true
 }
 
@@ -57,6 +133,7 @@ export function reiniciarActual() {
   actual.gastos = []
   actual.titulo = ''
   actual.fecha = ''
+  actual.guardado = false
   guardarActual()
 }
 
@@ -66,6 +143,7 @@ export function guardarEvento() {
   const titulo = String(actual.titulo ?? '').trim()
   if (!titulo || actual.gastos.length === 0) return false
 
+  actual.guardado = true
   if (!actual.fecha) {
     actual.fecha = fechaHoyISO()
   }
@@ -93,6 +171,26 @@ export function guardarEvento() {
   if (historial.length > storage.MAX_EVENTOS) {
     historial.splice(storage.MAX_EVENTOS)
   }
+  guardarHistorial()
+  return true
+}
+
+// Carga un evento guardado en `actual` (conserva su titulo y fecha para que al
+// regenerar se sobrescriba en el historial y no se duplique).
+export function abrirEvento(evento) {
+  if (!evento || !Array.isArray(evento.gastos)) return false
+  actual.asistentes = Array.isArray(evento.asistentes) ? [...evento.asistentes] : []
+  actual.gastos = evento.gastos.map((g) => ({ ...g }))
+  actual.titulo = String(evento.titulo ?? '')
+  actual.fecha = String(evento.fecha ?? '')
+  actual.guardado = true
+  guardarActual()
+  return true
+}
+
+export function borrarEvento(idx) {
+  if (idx < 0 || idx >= historial.length) return false
+  historial.splice(idx, 1)
   guardarHistorial()
   return true
 }

@@ -2,8 +2,9 @@
   import { actual } from '../lib/store.svelte.js'
   import { formatearARS } from '../lib/format.js'
   import GastoCard from '../components/GastoCard.svelte'
+  import Asistentes from '../components/Asistentes.svelte'
 
-  let { onCargar } = $props()
+  let { onCargar, onEditar, onBorrar } = $props()
 
   const total = $derived(actual.gastos.reduce((s, g) => s + g.monto, 0))
   const porPersona = $derived(
@@ -13,16 +14,21 @@
 </script>
 
 {#if actual.gastos.length === 0}
-  <div class="empty">
+  <div class="onboarding">
     <div class="fire-circle">
-      <span class="material-symbols-outlined">outdoor_grill</span>
+      <span class="material-symbols-outlined">group</span>
     </div>
-    <h2>¡El fuego está listo!</h2>
-    <p class="sub">Empieza a cargar los gastos del asado para ver el resumen y dividir las cuentas.</p>
-    <button class="cta" onclick={onCargar}>
-      <span class="material-symbols-outlined">add</span>
-      Cargar primer gasto
-    </button>
+    <h2>¿Quiénes van al asado?</h2>
+    <p class="sub">
+      Cargá a los asistentes (nombre y Enter). Cuando estén, tocá "Cargar gastos". Si olvidás a alguien, lo podés agregar más adelante.
+    </p>
+    <Asistentes titulo="" />
+    {#if actual.asistentes.length > 0}
+      <button class="cta" onclick={onCargar}>
+        <span class="material-symbols-outlined">arrow_forward</span>
+        Cargar gastos
+      </button>
+    {/if}
   </div>
 {:else}
   <div class="resumen">
@@ -37,38 +43,40 @@
       </div>
     </div>
 
+    <Asistentes />
+
     <h2 class="section-title">Últimos Gastos</h2>
     <ul class="list">
       {#each ultimos as gasto (gasto.id)}
-        <GastoCard {gasto} />
+        <GastoCard {gasto} {onEditar} {onBorrar} />
       {/each}
     </ul>
   </div>
 {/if}
 
 <style>
-  .empty {
+  .onboarding {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
     gap: 12px;
-    padding: 48px 8px;
+    padding: 24px 4px;
+    text-align: center;
   }
 
   .fire-circle {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     background: rgba(228, 177, 72, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 8px;
+    align-self: center;
+    margin-bottom: 4px;
   }
 
   .fire-circle .material-symbols-outlined {
-    font-size: 56px;
+    font-size: 48px;
     color: var(--accent);
   }
 
@@ -81,13 +89,15 @@
     margin: 0;
     color: rgba(48, 31, 24, 0.65);
     font-size: 15px;
-    max-width: 260px;
+    max-width: 300px;
+    align-self: center;
   }
 
   .cta {
-    margin-top: 16px;
+    margin-top: 8px;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     padding: 16px 24px;
     border-radius: var(--radius-lg);

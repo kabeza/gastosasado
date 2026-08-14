@@ -10,9 +10,9 @@ Problema que resuelve: al final de un asado, alguien pagó la carne, otro la beb
 
 ## 2. Flujo de uso (de punta a punta)
 
-1. Abrir la app (estado vacío) → tocar "+ Cargar primer gasto".
-2. Cargar gastos: **quién pagó**, **qué compró** (texto), **categoría** (opcional), **monto**, y **a quiénes aplica** (todos por defecto, o excluir personas).
-3. Ir a "Cuentas" → se genera el resumen y la lista de transferencias, y **se guarda el evento** en el historial (pide título obligatorio; la fecha es automática).
+1. Abrir la app (estado vacío) → cargar a los asistentes (escribir el nombre y Enter). Cuando estén, se habilita "Cargar gastos".
+2. Cargar gastos: **quién pagó**, **qué compró** (texto), **monto**, y **a quiénes aplica** (todos por defecto, o excluir personas).
+3. Ir a "Cuentas" → se genera el resumen y la lista de transferencias. Para guardar el evento en el historial se escribe el título y se toca "Guardar" (la fecha es automática). Una vez guardado, los cambios posteriores actualizan el evento.
 4. Compartir el resumen por WhatsApp (texto formateado con emojis).
 5. Desde el historial, volver a un asado anterior, ver su resumen, volver a compartirlo, o borrarlo.
 6. "Reiniciar" limpia solo la sesión actual y vuelve al estado vacío; el historial no se toca.
@@ -48,7 +48,6 @@ Todo persiste en `localStorage` del navegador.
 ### Gasto
 - `pagador` — nombre de quien pagó (obligatorio; debe ser un asistente, nuevo o existente).
 - `concepto` — texto libre "qué compró" (ej. "vino y gaseosas").
-- `categoria` — **opcional**. Valores fijos: `carne`, `leña`, `ensalada`, `fernet`, `hielo`, `picada`, `pan`, `otros`.
 - `monto` — ARS, 2 decimales.
 - `aplicaA` — conjunto de asistentes a los que aplica el gasto. Por defecto **todos**; se pueden **excluir** personas (ej. Ana no toma alcohol → excluirla de "bebidas").
 
@@ -69,25 +68,25 @@ Todo persiste en `localStorage` del navegador.
 ## 6. Pantallas y flujo (SPA)
 
 ### Shell global
-- **Cabecera:** logo grande a la izquierda (imagen de botella / vaso de fernet / fogata + texto "GASTOS ASADO"); título de la sección a la derecha; **ícono de historial en el extremo superior derecho**.
+- **Cabecera:** logo grande a la izquierda (imagen de botella / vaso de fernet / fogata); título de la sección a la derecha; **ícono de historial en el extremo superior derecho**.
 - **Barra de navegación inferior fija**, 4 ítems con ícono y etiqueta: **Resumen · + Gasto · Cuentas · Reiniciar**.
 
-### A. Resumen — estado vacío
-- Ilustración central de una parrilla con fuego dentro de un círculo.
-- Título "¡El fuego está listo!".
-- Subtítulo "Empieza a cargar los gastos del asado para ver el resumen y dividir las cuentas."
-- Botón central grande "+ Cargar primer gasto".
+### A. Resumen — estado inicial (cargar asistentes)
+- Ilustración central dentro de un círculo.
+- Título "¿Quiénes van al asado?".
+- Subtítulo: cargar a los asistentes (nombre y Enter); cuando estén, aparece el botón "Cargar gastos".
+- Input "Nombre y Enter para agregar" + chips por asistente con editar/borrar.
+- Si se olvidó a alguien, se puede agregar después desde la tarjeta "Asistentes" (visible también con gastos cargados).
 
 ### B. Resumen de Gastos — con datos
 - Tarjeta oscura superior con "Total Acumulado" y "Por Persona".
-- Lista "Últimos Gastos": tarjetas con ícono de categoría, nombre/concepto, quién pagó, monto y etiqueta de categoría.
+- Lista "Últimos Gastos": tarjetas con nombre/concepto, quién pagó y monto.
 - (Sin barra de presupuesto.)
 
 ### C. Cargar Gasto — formulario
 - Selector numérico grande para el monto.
-- "¿Quién pagó?": input de búsqueda **entre asistentes ya cargados** + chips de acceso rápido; para uno nuevo se escribe el nombre a mano. **Sin** lectura de contactos del teléfono.
+- "¿Quién pagó?": selector de chips **entre asistentes ya cargados** (los asistentes se cargan antes de los gastos). **Sin** lectura de contactos del teléfono.
 - "¿Qué compró?": input de texto descriptivo.
-- Selector de categorías (opcional): botones grandes con íconos — carne, leña, ensalada, fernet, hielo, picada, pan, otros.
 - Sección de **aplicación**: todos por defecto; opción de excluir asistentes específicos.
 - Botón de acción "Agregar al Ticket" con ícono de flecha.
 
@@ -95,7 +94,10 @@ Todo persiste en `localStorage` del navegador.
 - Tarjeta de resumen: total gastado, cantidad de personas y costo promedio por persona.
 - Sección "Transferencias Pendientes": tarjetas blancas con texto grande "Persona A le debe a Persona B" y el monto destacado en rojo.
 - "Cuentas saldadas": texto tachado en gris con ícono de check (personas con neto 0).
-- Botones: "Compartir por WhatsApp" (verde) y "Reiniciar Evento" (contorno rojo al final).
+- Campo "Título del asado" con botón "Guardar" al lado: confirma y guarda el evento en el historial; los cambios posteriores se actualizan solos.
+- Botón "Compartir por WhatsApp" (verde): exige haber guardado el título; caso contrario no comparte. El mensaje incluye "Gastos" (listado de gastos, quién pagó y monto), "Total de gastos", "Gasto (promedio) por persona" y "Transferencias Pendientes".
+- Checkbox "Compartir como imagen" (desmarcado por defecto): si está marcado, el botón genera una imagen del resumen (logo, título, gastos, totales, transferencias y footer con desarrollador/versión) y la comparte vía la hoja de compartir del sistema (o la descarga si no hay soporte).
+- El reinicio del evento se hace desde la barra inferior ("Reiniciar"), no desde esta pantalla.
 
 ### Historial (desde el ícono de la cabecera)
 - Lista de eventos guardados (últimos 10).
@@ -120,8 +122,8 @@ Todo persiste en `localStorage` del navegador.
 
 - **Persistencia:** `localStorage`. Sin backend.
 - **Historial:** máximo **10 eventos** (los más recientes; los más viejos se descartan).
-- **Guardado:** ocurre al **generar el resumen/lista de transferencias** (pantalla Cuentas). En ese momento se pide título (obligatorio) y la fecha se toma como el día actual. Se guarda/sobrescribe según la clave `titulo + fecha`.
-- **Actualización:** si después se edita/borra un gasto o asistente y se **regenera** el resumen/transferencias, el evento guardado se actualiza (no se duplica).
+- **Guardado:** botón "Guardar" junto al campo título en la pantalla Cuentas (título obligatorio). La fecha se toma como el día actual la primera vez y se conserva. Se guarda/sobrescribe según la clave `titulo + fecha`.
+- **Actualización:** una vez guardado, editar/borrar gastos o asistentes actualiza automáticamente el evento guardado (no se duplica, no hace falta re-guardar ni compartir).
 - **Reiniciar:** limpia solo lo cargado en la sesión actual y vuelve al estado vacío; **no** modifica el historial.
 - **Edición/borrado:** todo es editable/borrable en cualquier momento — gastos, asistentes y eventos — con recálculo automático de la liquidación.
 

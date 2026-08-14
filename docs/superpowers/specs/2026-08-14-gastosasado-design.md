@@ -112,7 +112,7 @@ Dos claves:
 
 ## 7. PWA
 
-- `manifest.json` generado por `vite-plugin-pwa`: nombre **"Gastos Asado"**, short name **"G.Asado"**, theme/background `#301f18`, fondo `#fdfaea`, íconos derivados de `gastoslogo.png` (192, 512, maskable, apple-touch-icon).
+- `manifest.json` generado por `vite-plugin-pwa`: nombre **"Gastos Asado"**, short name **"G.Asado"**, theme/background `#301f18`, fondo `#fdfaea`. Ícono de la app: `public/iconoapp.png` (1024×1024), usado también como favicon y apple-touch-icon; se declara en 192, 512 y 1024.
 - Service worker (Workbox) precachea los assets estáticos; los datos ya son offline por `localStorage`.
 - Requiere **HTTPS** en producción (el hosting del usuario lo da).
 

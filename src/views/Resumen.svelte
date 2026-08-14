@@ -67,7 +67,7 @@
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background: rgba(228, 177, 72, 0.15);
+    background: var(--accent-soft);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -87,7 +87,7 @@
 
   .sub {
     margin: 0;
-    color: rgba(48, 31, 24, 0.65);
+    color: var(--muted);
     font-size: 15px;
     max-width: 300px;
     align-self: center;
@@ -102,7 +102,7 @@
     padding: 16px 24px;
     border-radius: var(--radius-lg);
     background: var(--accent);
-    color: var(--primary);
+    color: var(--on-accent);
     font-weight: 800;
     font-size: 16px;
   }
@@ -114,8 +114,8 @@
 
   .card {
     display: flex;
-    background: var(--primary);
-    color: var(--bg);
+    background: var(--hero-bg);
+    color: var(--hero-fg);
     border-radius: var(--radius-lg);
     padding: 20px;
     gap: 16px;
@@ -129,7 +129,7 @@
   }
 
   .block + .block {
-    border-left: 1px solid rgba(253, 250, 234, 0.15);
+    border-left: 1px solid var(--hero-border);
     padding-left: 16px;
   }
 
@@ -137,13 +137,13 @@
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: rgba(253, 250, 234, 0.65);
+    color: var(--hero-muted);
   }
 
   .value {
     font-size: 22px;
     font-weight: 800;
-    color: var(--accent);
+    color: var(--hero-accent);
   }
 
   .section-title {

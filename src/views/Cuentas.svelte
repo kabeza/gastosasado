@@ -10,7 +10,8 @@
   const promedio = $derived(nPersonas > 0 ? Math.round(res.total / nPersonas) : 0)
   const saldadas = $derived(res.balances.filter((b) => b.balance === 0).map((b) => b.nombre))
 
-  let tituloTxt = $state(actual.titulo ?? '')
+  const tituloInicial = actual.titulo
+  let tituloTxt = $state(tituloInicial ?? '')
   let feedback = $state('')
   let compartirComoImagen = $state(false)
 
@@ -142,7 +143,7 @@
   }
 
   .empty p {
-    color: rgba(48, 31, 24, 0.6);
+    color: var(--muted);
   }
 
   .cuentas {
@@ -174,9 +175,9 @@
     font: inherit;
     font-size: 16px;
     padding: 12px;
-    border: 1px solid rgba(48, 31, 24, 0.15);
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-sm);
-    background: #fff;
+    background: var(--surface);
     color: var(--primary);
   }
 
@@ -187,7 +188,7 @@
     padding: 12px 14px;
     border-radius: var(--radius-sm);
     background: var(--accent);
-    color: var(--primary);
+    color: var(--on-accent);
     font-weight: 800;
     font-size: 14px;
     flex-shrink: 0;
@@ -208,15 +209,15 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    background: #fff;
-    border: 1px solid rgba(48, 31, 24, 0.08);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 16px;
   }
 
   .resumen-label {
     font-size: 13px;
-    color: rgba(48, 31, 24, 0.6);
+    color: var(--muted);
   }
 
   .resumen-total {
@@ -226,7 +227,7 @@
 
   .resumen-meta {
     font-size: 13px;
-    color: rgba(48, 31, 24, 0.6);
+    color: var(--muted);
   }
 
   .section-title {
@@ -248,8 +249,8 @@
     justify-content: space-between;
     align-items: center;
     gap: 12px;
-    background: #fff;
-    border: 1px solid rgba(48, 31, 24, 0.08);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 14px;
   }
@@ -267,7 +268,7 @@
 
   .nota {
     margin: 0;
-    color: rgba(48, 31, 24, 0.6);
+    color: var(--muted);
     font-size: 14px;
   }
 
@@ -276,7 +277,7 @@
     align-items: center;
     gap: 8px;
     margin-top: 12px;
-    color: rgba(48, 31, 24, 0.5);
+    color: var(--muted);
     font-size: 14px;
   }
 
@@ -312,7 +313,7 @@
     padding: 14px;
     border-radius: var(--radius-lg);
     background: var(--success);
-    color: #fff;
+    color: var(--on-success);
     font-weight: 800;
     font-size: 15px;
   }

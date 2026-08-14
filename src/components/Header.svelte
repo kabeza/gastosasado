@@ -1,4 +1,6 @@
 <script>
+  import { tema, alternarTema } from '../lib/tema.svelte.js'
+
   let { current, onHistory, onHome } = $props()
 
   const titles = {
@@ -14,6 +16,9 @@
     <img src="gastoslogo.png" alt="Gastos Asado" />
   </button>
   <span class="title">{titles[current] ?? ''}</span>
+  <button class="theme" onclick={alternarTema} aria-label="Cambiar tema claro/oscuro">
+    <span class="material-symbols-outlined">{tema.valor === 'dark' ? 'light_mode' : 'dark_mode'}</span>
+  </button>
   <button class="history" onclick={onHistory} aria-label="Historial">
     <span class="material-symbols-outlined">history</span>
   </button>
@@ -25,7 +30,7 @@
     align-items: center;
     gap: 10px;
     padding: 12px 16px;
-    border-bottom: 1px solid rgba(48, 31, 24, 0.08);
+    border-bottom: 1px solid var(--border);
     background: var(--bg);
   }
 
@@ -49,6 +54,7 @@
     white-space: nowrap;
   }
 
+  .theme,
   .history {
     display: flex;
     align-items: center;

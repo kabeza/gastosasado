@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => {
       svelte(),
       VitePWA({
         registerType: 'autoUpdate',
+        includeAssets: ['iconoapp.png', 'gastoslogo.png'],
         manifest: {
           name: 'Gastos Asado',
           short_name: 'G.Asado',
@@ -17,8 +18,12 @@ export default defineConfig(({ mode }) => {
           theme_color: '#301f18',
           background_color: '#fdfaea',
           display: 'standalone',
-          start_url: '.'
-          // íconos: se agregan en la etapa 8
+          start_url: '.',
+          icons: [
+            { src: 'iconoapp.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: 'iconoapp.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+            { src: 'iconoapp.png', sizes: '1024x1024', type: 'image/png', purpose: 'any' }
+          ]
         }
       })
     ]

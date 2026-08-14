@@ -116,9 +116,9 @@
     font: inherit;
     font-size: 14px;
     padding: 10px 14px;
-    border: 1px solid rgba(48, 31, 24, 0.15);
+    border: 1px solid var(--border-strong);
     border-radius: 999px;
-    background: #fff;
+    background: var(--surface);
     color: var(--primary);
   }
 
@@ -135,7 +135,7 @@
     height: 38px;
     border-radius: 50%;
     background: var(--accent);
-    color: var(--primary);
+    color: var(--on-accent);
     flex-shrink: 0;
   }
 
@@ -155,8 +155,8 @@
     gap: 4px;
     padding: 6px 8px 6px 14px;
     border-radius: 999px;
-    background: #fff;
-    border: 1px solid rgba(48, 31, 24, 0.12);
+    background: var(--surface);
+    border: 1px solid var(--border);
     font-size: 14px;
   }
 
@@ -169,7 +169,7 @@
     align-items: center;
     justify-content: center;
     padding: 2px;
-    color: rgba(48, 31, 24, 0.45);
+    color: var(--muted-strong);
   }
 
   .icon-btn.ok {
@@ -187,7 +187,7 @@
     padding: 4px 6px;
     border-radius: 999px;
     border: 1px solid var(--accent);
-    background: #fff;
+    background: var(--surface);
   }
 
   .edit input {

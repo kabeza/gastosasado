@@ -1,12 +1,49 @@
 :root {
   --bg: #fdfaea;
+  --surface: #ffffff;
   --primary: #301f18;
   --accent: #e4b148;
+  --accent-soft: rgba(228, 177, 72, 0.15);
+  --on-accent: #301f18;
   --danger: #e5504d;
   --success: #2ecc71;
+  --on-success: #ffffff;
+  --muted: rgba(48, 31, 24, 0.6);
+  --muted-strong: rgba(48, 31, 24, 0.45);
+  --border: rgba(48, 31, 24, 0.08);
+  --border-strong: rgba(48, 31, 24, 0.2);
+  --hero-bg: #301f18;
+  --hero-fg: #fdfaea;
+  --hero-muted: rgba(253, 250, 234, 0.65);
+  --hero-border: rgba(253, 250, 234, 0.15);
+  --hero-accent: #e4b148;
   --radius-sm: 8px;
   --radius-lg: 16px;
   --font: 'Nunito', system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+}
+
+/* Tema oscuro: cálido y suave, con contraste alto. */
+[data-theme='dark'] {
+  --bg: #1a1512;
+  --surface: #28221c;
+  --primary: #f2ebe1;
+  --accent: #e6b45c;
+  --accent-soft: rgba(230, 180, 92, 0.15);
+  --on-accent: #2a2013;
+  --danger: #f28a85;
+  --success: #5fd08a;
+  --on-success: #1a1512;
+  --muted: rgba(242, 235, 225, 0.65);
+  --muted-strong: rgba(242, 235, 225, 0.5);
+  --border: rgba(242, 235, 225, 0.1);
+  --border-strong: rgba(242, 235, 225, 0.22);
+  --hero-bg: #f2ebe1;
+  --hero-fg: #1a1512;
+  --hero-muted: rgba(26, 21, 18, 0.65);
+  --hero-border: rgba(26, 21, 18, 0.15);
+  --hero-accent: #9a6a10;
+  color-scheme: dark;
 }
 
 * {

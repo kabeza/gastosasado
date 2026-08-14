@@ -114,6 +114,7 @@ Todo persiste en `localStorage` del navegador.
   - Deudas/montos negativos: rojo suave.
   - Éxito/WhatsApp: verde `#2ecc71`.
 - **Bordes:** esquinas redondeadas de 8–16 px en tarjetas y botones.
+- **Tema claro/oscuro:** toggle en la cabecera. Al primer arranque detecta `prefers-color-scheme`; la elección del usuario se guarda en `localStorage` (clave `gastosasado.tema`). El tema oscuro es cálido (fondo `#1a1512`, texto `#f2ebe1`) y usa tokens CSS definidos en `app.css`.
 - **Iconografía:** íconos de línea minimalistas (Material Symbols o Lucide).
 - **Layout:** mobile-first, viewport objetivo 390–430 px. SPA con transiciones suaves entre vistas.
 - **Logo:** usar [gastoslogo.png](../../../gastoslogo.png) como referencia de marca.

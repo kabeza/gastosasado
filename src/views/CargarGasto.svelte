@@ -6,6 +6,10 @@
 
   const esEdicion = $derived(!!gastoInicial)
 
+  // Snapshot del gasto en edición: la vista se remonta al navegar, así que el
+  // formulario solo necesita el valor inicial del prop.
+  const base = gastoInicial
+
   // centavos -> texto "1500,50" (parseable por parsePesos)
   function centavosATexto(centavos) {
     const c = Math.round(Number(centavos) || 0)
@@ -14,11 +18,11 @@
     return `${entero},${dec}`
   }
 
-  let montoTexto = $state(gastoInicial ? centavosATexto(gastoInicial.monto) : '')
-  let pagador = $state(gastoInicial?.pagador ?? '')
-  let concepto = $state(gastoInicial?.concepto ?? '')
-  let aplicaATodos = $state(gastoInicial ? !(gastoInicial.excluidos?.length > 0) : true)
-  let excluidos = $state(gastoInicial?.excluidos?.slice() ?? [])
+  let montoTexto = $state(base ? centavosATexto(base.monto) : '')
+  let pagador = $state(base?.pagador ?? '')
+  let concepto = $state(base?.concepto ?? '')
+  let aplicaATodos = $state(base ? !(base.excluidos?.length > 0) : true)
+  let excluidos = $state(base?.excluidos?.slice() ?? [])
 
   const montoCentavos = $derived(parsePesos(montoTexto))
   // Un concepto idéntico al nombre de un asistente es un error de carga.
@@ -71,7 +75,7 @@
   <div class="form">
     <!-- Quién pagó -->
     <section>
-      <label>¿Quién pagó?</label>
+      <span class="campo-label">¿Quién pagó?</span>
       <div class="chips">
         {#each actual.asistentes as nombre (nombre)}
           <button class="chip" class:seleccionado={pagador === nombre} onclick={() => { pagador = nombre }}>
@@ -151,7 +155,7 @@
 
   .guard p {
     margin: 0;
-    color: rgba(48, 31, 24, 0.6);
+    color: var(--muted);
   }
 
   section {
@@ -160,7 +164,8 @@
     gap: 8px;
   }
 
-  label {
+  label,
+  .campo-label {
     font-weight: 700;
     font-size: 14px;
   }
@@ -169,9 +174,9 @@
     font: inherit;
     font-size: 16px;
     padding: 12px;
-    border: 1px solid rgba(48, 31, 24, 0.15);
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-sm);
-    background: #fff;
+    background: var(--surface);
     color: var(--primary);
   }
 
@@ -184,14 +189,14 @@
   .chip {
     padding: 8px 14px;
     border-radius: 999px;
-    border: 1px solid rgba(48, 31, 24, 0.2);
+    border: 1px solid var(--border-strong);
     font-size: 14px;
   }
 
   .chip.seleccionado {
     background: var(--accent);
     border-color: var(--accent);
-    color: var(--primary);
+    color: var(--on-accent);
     font-weight: 700;
   }
 
@@ -229,7 +234,7 @@
   .preview {
     margin: 0;
     font-size: 13px;
-    color: rgba(48, 31, 24, 0.6);
+    color: var(--muted);
   }
 
   .error {
@@ -254,7 +259,7 @@
   .hint {
     margin: 0;
     font-size: 13px;
-    color: rgba(48, 31, 24, 0.6);
+    color: var(--muted);
   }
 
   .submit {
@@ -265,7 +270,7 @@
     padding: 16px;
     border-radius: var(--radius-lg);
     background: var(--accent);
-    color: var(--primary);
+    color: var(--on-accent);
     font-size: 16px;
     font-weight: 800;
   }

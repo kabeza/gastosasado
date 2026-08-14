@@ -26,7 +26,7 @@
     display: flex;
     flex-shrink: 0;
     background: var(--bg);
-    border-top: 1px solid rgba(48, 31, 24, 0.08);
+    border-top: 1px solid var(--border);
     padding-bottom: env(safe-area-inset-bottom);
   }
 
@@ -37,7 +37,7 @@
     align-items: center;
     gap: 2px;
     padding: 8px 0;
-    color: rgba(48, 31, 24, 0.55);
+    color: var(--muted);
     font-size: 11px;
   }
 

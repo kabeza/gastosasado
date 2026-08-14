@@ -28,8 +28,8 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #fff;
-    border: 1px solid rgba(48, 31, 24, 0.08);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 12px 14px;
   }
@@ -58,7 +58,7 @@
 
   .pagador {
     font-size: 12px;
-    color: rgba(48, 31, 24, 0.55);
+    color: var(--muted);
   }
 
   .monto {
@@ -78,7 +78,7 @@
     align-items: center;
     justify-content: center;
     padding: 2px;
-    color: rgba(48, 31, 24, 0.45);
+    color: var(--muted-strong);
   }
 
   .act .material-symbols-outlined {

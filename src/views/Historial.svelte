@@ -75,12 +75,12 @@
 
   .empty .material-symbols-outlined {
     font-size: 48px;
-    color: rgba(48, 31, 24, 0.35);
+    color: var(--muted-strong);
   }
 
   .empty p {
     margin: 0;
-    color: rgba(48, 31, 24, 0.6);
+    color: var(--muted);
   }
 
   .empty .hint {
@@ -101,8 +101,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #fff;
-    border: 1px solid rgba(48, 31, 24, 0.08);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius-sm);
     padding: 14px;
   }
@@ -128,7 +128,7 @@
 
   .meta {
     font-size: 12px;
-    color: rgba(48, 31, 24, 0.55);
+    color: var(--muted);
   }
 
   .acciones {
@@ -143,7 +143,7 @@
     align-items: center;
     justify-content: center;
     padding: 6px;
-    color: rgba(48, 31, 24, 0.55);
+    color: var(--muted);
   }
 
   .act.danger {

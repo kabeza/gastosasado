@@ -6,10 +6,6 @@
 
   const esEdicion = $derived(!!gastoInicial)
 
-  // Snapshot del gasto en edición: la vista se remonta al navegar, así que el
-  // formulario solo necesita el valor inicial del prop.
-  const base = gastoInicial
-
   // centavos -> texto "1500,50" (parseable por parsePesos)
   function centavosATexto(centavos) {
     const c = Math.round(Number(centavos) || 0)
@@ -18,11 +14,24 @@
     return `${entero},${dec}`
   }
 
-  let montoTexto = $state(base ? centavosATexto(base.monto) : '')
-  let pagador = $state(base?.pagador ?? '')
-  let concepto = $state(base?.concepto ?? '')
-  let aplicaATodos = $state(base ? !(base.excluidos?.length > 0) : true)
-  let excluidos = $state(base?.excluidos?.slice() ?? [])
+  // La vista se remonta al navegar: el formulario solo necesita el valor
+  // inicial del prop, leído una sola vez dentro de esta closure.
+  const inicial = (() => {
+    const g = gastoInicial
+    return {
+      montoTexto: g ? centavosATexto(g.monto) : '',
+      pagador: g?.pagador ?? '',
+      concepto: g?.concepto ?? '',
+      aplicaATodos: g ? !(g.excluidos?.length > 0) : true,
+      excluidos: g?.excluidos?.slice() ?? []
+    }
+  })()
+
+  let montoTexto = $state(inicial.montoTexto)
+  let pagador = $state(inicial.pagador)
+  let concepto = $state(inicial.concepto)
+  let aplicaATodos = $state(inicial.aplicaATodos)
+  let excluidos = $state(inicial.excluidos)
 
   const montoCentavos = $derived(parsePesos(montoTexto))
   // Un concepto idéntico al nombre de un asistente es un error de carga.

@@ -22,8 +22,8 @@ function escribirJSON(clave, valor) {
 }
 
 function normalizarActual(a) {
-  if (!a || typeof a !== 'object') return { asistentes: [], gastos: [] }
-  const out = { asistentes: [], gastos: [] }
+  if (!a || typeof a !== 'object') return { asistentes: [], gastos: [], titulo: '', fecha: '' }
+  const out = { asistentes: [], gastos: [], titulo: '', fecha: '' }
   if (Array.isArray(a.asistentes)) out.asistentes = a.asistentes
   if (Array.isArray(a.gastos)) out.gastos = a.gastos
   if (typeof a.titulo === 'string') out.titulo = a.titulo

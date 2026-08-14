@@ -1,4 +1,6 @@
 import * as storage from './storage.js'
+import { liquidar } from './liquidacion.js'
+import { fechaHoyISO } from './format.js'
 
 // Estado compartido reactivo (Svelte 5 runes). Se comparte entre todos los
 // componentes que lo importan y se persiste en localStorage tras cada cambio.
@@ -53,5 +55,44 @@ export function agregarGasto(gasto) {
 export function reiniciarActual() {
   actual.asistentes = []
   actual.gastos = []
+  actual.titulo = ''
+  actual.fecha = ''
   guardarActual()
+}
+
+// Guarda el evento actual en el historial (sobrescribe por titulo+fecha).
+// Fija la fecha la primera vez y la conserva al regenerar (no se re-stampa).
+export function guardarEvento() {
+  const titulo = String(actual.titulo ?? '').trim()
+  if (!titulo || actual.gastos.length === 0) return false
+
+  if (!actual.fecha) {
+    actual.fecha = fechaHoyISO()
+  }
+  guardarActual()
+
+  const { transferencias } = liquidar({
+    asistentes: actual.asistentes,
+    gastos: actual.gastos
+  })
+
+  const evento = {
+    titulo,
+    fecha: actual.fecha,
+    asistentes: [...actual.asistentes],
+    gastos: actual.gastos.map((g) => ({ ...g })),
+    transferencias
+  }
+
+  const idx = historial.findIndex((e) => e.titulo === titulo && e.fecha === actual.fecha)
+  if (idx >= 0) {
+    historial[idx] = evento
+  } else {
+    historial.unshift(evento)
+  }
+  if (historial.length > storage.MAX_EVENTOS) {
+    historial.splice(storage.MAX_EVENTOS)
+  }
+  guardarHistorial()
+  return true
 }

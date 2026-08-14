@@ -5,6 +5,7 @@
   import CargarGasto from './views/CargarGasto.svelte'
   import Cuentas from './views/Cuentas.svelte'
   import Historial from './views/Historial.svelte'
+  import { reiniciarActual } from './lib/store.svelte.js'
 
   let current = $state('resumen')
   let mainEl = $state(null)
@@ -19,8 +20,9 @@
   }
 
   function reiniciar() {
-    // se cablea en la etapa 8
-    console.log('Reiniciar (pendiente)')
+    if (!window.confirm('¿Reiniciar el evento? Se borrarán los gastos cargados.')) return
+    reiniciarActual()
+    current = 'resumen'
   }
 </script>
 
@@ -28,11 +30,11 @@
 
 <main bind:this={mainEl}>
   {#if current === 'resumen'}
-    <Resumen />
+    <Resumen onCargar={() => go('cargar')} />
   {:else if current === 'cargar'}
     <CargarGasto onAgregado={() => go('resumen')} />
   {:else if current === 'cuentas'}
-    <Cuentas />
+    <Cuentas onReiniciar={reiniciar} />
   {:else if current === 'historial'}
     <Historial />
   {/if}

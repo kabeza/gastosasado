@@ -38,9 +38,8 @@
   }
 
   .logo img {
-    width: 44px;
     height: 44px;
-    object-fit: contain;
+    width: auto;
     flex-shrink: 0;
   }
 

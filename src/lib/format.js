@@ -45,3 +45,19 @@ export function parsePesos(texto) {
   const n = parseFloat(s)
   return Number.isFinite(n) ? Math.round(n * 100) : 0
 }
+
+// fecha de hoy en 'YYYY-MM-DD' (clave de evento)
+export function fechaHoyISO() {
+  const d = new Date()
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const dia = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${dia}`
+}
+
+// 'YYYY-MM-DD' -> 'DD/MM/YYYY' (para mostrar en el mensaje de WhatsApp)
+export function formatearFecha(iso) {
+  if (!iso) return ''
+  const [y, m, d] = String(iso).split('-')
+  return `${d}/${m}/${y}`
+}

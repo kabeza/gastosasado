@@ -32,8 +32,10 @@
   }
 
   function onGastoGuardado() {
+    const eraEdicion = gastoEditando != null
     gastoEditando = null
-    current = 'resumen'
+    // Alta nueva: quedarse en la pantalla para seguir cargando. Edición: volver.
+    if (eraEdicion) current = 'resumen'
   }
 
   function reiniciar() {

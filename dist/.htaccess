@@ -1,0 +1,27 @@
+# Cabeceras de caché para la PWA (Apache / LiteSpeed).
+# Se copia automáticamente a dist/ al buildear (viene de public/).
+#
+# Estrategia:
+#  - index.html y sw.js  -> SIEMPRE revalidar contra el servidor (no-cache).
+#    Así la página carga siempre la versión nueva y el service worker detecta
+#    actualizaciones en cada visita.
+#  - assets/*.js y *.css  -> tienen hash en el nombre (cambian con cada build),
+#    se pueden cachear para siempre (immutable).
+#
+# IMPORTANTE: sw.js es un .js en la raíz, así que la regla "immutable" de los
+# assets lo matchea también. En .htaccess gana la última regla que toca el
+# mismo header, por eso la regla no-cache va DESPUÉS de la de assets.
+<IfModule mod_headers.c>
+  # Assets hasheados (viven en /assets/): cachear para siempre.
+  <FilesMatch "\.(js|css)$">
+    Header always set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Página y service worker: siempre frescos. Va al final para ganarle a la
+  # regla de arriba cuando el archivo es sw.js.
+  <FilesMatch "^(index\.html|sw\.js)$">
+    Header always set Cache-Control "no-cache, no-store, must-revalidate"
+    Header always set Pragma "no-cache"
+    Header always set Expires "0"
+  </FilesMatch>
+</IfModule>

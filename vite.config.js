@@ -11,6 +11,24 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: ['iconoapp.png', 'gastoslogo.png'],
+        // Navegaciones siempre frescas: online = red primero (NetworkFirst),
+        // offline = fallback al index.html precacheado.
+        // navigateFallback:null y directoryIndex:null evitan que el precache /
+        // NavigationRoute (cache-first) ensombrezca la ruta NetworkFirst.
+        workbox: {
+          navigateFallback: null,
+          directoryIndex: null,
+          runtimeCaching: [
+            {
+              urlPattern: ({ request }) => request.mode === 'navigate',
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'paginas',
+                precacheFallback: { fallbackURL: 'index.html' }
+              }
+            }
+          ]
+        },
         manifest: {
           name: 'Gastos Asado',
           short_name: 'G.Asado',

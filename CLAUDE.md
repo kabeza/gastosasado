@@ -20,5 +20,9 @@
 
 ## Despliegue
 
-- Self-hosted, en una **subcarpeta** del dominio propio.
-- Requiere configurar `base` en Vite a esa subcarpeta (valor pendiente de definir con el usuario).
+- Self-hosted, en una **subcarpeta** del dominio propio (`/gastosasado/`, definida en `.env` → `VITE_BASE_PATH`).
+- `base` de Vite se toma de `VITE_BASE_PATH`; si cambia la subcarpeta, editar `.env` y rebuildear.
+- **Cache / actualización PWA** (importante para que la app instalada se actualice sola):
+  - Service worker: `registerType: 'autoUpdate'` + `registerSW({ immediate: true })` en `src/main.js`. Cada build regenera `sw.js` con manifest de precache nuevo.
+  - Navegaciones: `NetworkFirst` (vite.config.js → `workbox.runtimeCaching`). Online = red primero; offline = fallback a `index.html` cacheado.
+  - Cabeceras del server: `index.html` y `sw.js` deben servirse con `Cache-Control: no-cache`; `assets/*.js|css` con `max-age=31536000, immutable`. Ver [public/.htaccess](public/.htaccess) (Apache) y [docs/cache-nginx.md](docs/cache-nginx.md) (nginx).

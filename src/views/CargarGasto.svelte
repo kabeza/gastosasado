@@ -72,6 +72,12 @@
       onAgregado?.()
     }
   }
+
+  // Enter en cualquier campo del form dispara el submit (agregar si está todo bien).
+  function handleSubmit(e) {
+    e.preventDefault()
+    enviar()
+  }
 </script>
 
 {#if actual.asistentes.length === 0}
@@ -81,13 +87,13 @@
     <button class="submit" onclick={onIrAsistentes}>Ir a asistentes</button>
   </div>
 {:else}
-  <div class="form">
+  <form class="form" onsubmit={handleSubmit}>
     <!-- Quién pagó -->
     <section>
       <span class="campo-label">¿Quién pagó?</span>
       <div class="chips">
         {#each actual.asistentes as nombre (nombre)}
-          <button class="chip" class:seleccionado={pagador === nombre} onclick={() => { pagador = nombre }}>
+          <button type="button" class="chip" class:seleccionado={pagador === nombre} onclick={() => { pagador = nombre }}>
             {nombre}
           </button>
         {/each}
@@ -125,7 +131,7 @@
         <p class="hint">Marcá quiénes <strong>NO</strong> participan de este gasto:</p>
         <div class="chips">
           {#each actual.asistentes as nombre (nombre)}
-            <button class="chip" class:excluido={excluidos.includes(nombre)} onclick={() => toggleExcluido(nombre)}>
+            <button type="button" class="chip" class:excluido={excluidos.includes(nombre)} onclick={() => toggleExcluido(nombre)}>
               {nombre}
             </button>
           {/each}
@@ -133,11 +139,29 @@
       {/if}
     </section>
 
-    <button class="submit" disabled={!puedeAgregar} onclick={enviar}>
+    <button type="submit" class="submit" disabled={!puedeAgregar}>
       <span class="material-symbols-outlined">arrow_forward</span>
-      {esEdicion ? 'Guardar cambios' : 'Agregar al Ticket'}
+      {esEdicion ? 'Guardar cambios' : 'Agregar Gasto'}
     </button>
-  </div>
+
+    {#if !esEdicion && actual.gastos.length > 0}
+      <section class="historial">
+        <h3 class="historial-titulo">Gastos cargados ({actual.gastos.length})</h3>
+        <ul>
+          {#each actual.gastos as g (g.id)}
+            <li>
+              <span class="h-pagador">{g.pagador}</span>
+              <span class="h-concepto">{g.concepto || 'sin concepto'}</span>
+              {#if g.excluidos?.length > 0}
+                <span class="h-excluidos">(no: {g.excluidos.join(', ')})</span>
+              {/if}
+              <span class="h-monto">{formatearARS(g.monto)}</span>
+            </li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
+  </form>
 {/if}
 
 <style>
@@ -291,5 +315,62 @@
   .submit:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+  }
+
+  .historial {
+    gap: 6px;
+  }
+
+  .historial-titulo {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+
+  .historial ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .historial li {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 13px;
+    padding: 6px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+
+  .h-pagador {
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .h-concepto {
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .h-excluidos {
+    font-size: 11px;
+    color: var(--danger);
+    flex-shrink: 0;
+  }
+
+  .h-monto {
+    margin-left: auto;
+    font-weight: 700;
+    flex-shrink: 0;
   }
 </style>
